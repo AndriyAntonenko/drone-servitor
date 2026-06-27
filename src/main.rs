@@ -1,7 +1,10 @@
-use drone_servitor::telemetry::{
-    Telemetry,
-    heartbeat::{HeartbeatBus, HeartbeatStateTracker},
-    parse_known_telemetry,
+use drone_servitor::{
+    telemetry::{
+        Telemetry,
+        heartbeat::{HeartbeatBus, HeartbeatStateTracker},
+        parse_known_telemetry,
+    },
+    tracing::setup_tracing,
 };
 use mavlink::dialects::ardupilotmega::MavMessage;
 use tracing::{info, trace, warn};
@@ -19,8 +22,7 @@ async fn load_config(path: &str) -> anyhow::Result<Config> {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    tracing_subscriber::fmt::init();
-
+    let _guard = setup_tracing();
     let config = load_config("config.toml").await?;
 
     let conn = mavlink::connect_async::<MavMessage>(config.connection_string.as_str()).await?;
